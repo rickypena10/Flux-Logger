@@ -83,7 +83,7 @@ def serial_ports():
 def input_arguments(): # arguments that are user defined
     # run script + -h to list current ports and see arguments.
     parser = ArgumentParser()
-    parser.add_argument('--instrument', type = str, default = 'csat3b',
+    parser.add_argument('--instrument', type = str, default = 'serial',
         help = 'Select instrument in use: csat3b, windmaster, pops or uhsas')
     parser.add_argument('--port', type = str, help = 'Select the appropriate serial port in use.')
     parser.add_argument('--directory', type = str, default = os.getcwd(),
@@ -91,16 +91,28 @@ def input_arguments(): # arguments that are user defined
     arguments = parser.parse_args()
     return arguments
 
-def open_port(serial_port, baudrate):
+def open_port(serial_port, baudrate, instrument_type):
     #accessing/opeing the computer serial port
-    ser = serial.Serial(
-        port = serial_port,
-        baudrate = baudrate,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
-        rtscts = True,
-        timeout=0)
+    if instrument_type == "csat3b":
+        ser = serial.Serial(
+            port = serial_port,
+            baudrate = baudrate,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS,
+            rtscts = True,
+            xonxoff= True,
+            dsrdtr= True,
+            timeout=0)
+    else:
+        ser = serial.Serial(
+            port = serial_port,
+            baudrate = baudrate,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS,
+            rtscts = True,
+            timeout=0)
 
     print(ser)
     print(ser.name)
@@ -108,7 +120,7 @@ def open_port(serial_port, baudrate):
     return ser
 
 def define_header(serial_port, baudrate, instrument_type):
-    ser0 = open_port(serial_port, baudrate)
+    ser0 = open_port(serial_port, baudrate, instrument_type)
     header_0 = serial_read(ser0, instrument_type)
     header_1 = serial_read(ser0, instrument_type)
     header0 = header_0.split("\r")[0].split("\t")
@@ -179,6 +191,11 @@ def create_logging_file(dir_path, instrument_type, file_heading):
             stats2 = "Data_status, baseline(counts), stdev_baseline, max_stdev,"
             stats3 = "PumpFB(PID),LaserT(C),LaserFB(PID),Laser_Monitor,Voltage(V),"
             header = ID+stats1+stats2+stats3+bin_header+"\n"
+
+        elif instrument_type == "serial":
+            fname = 'serial_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
+            header = ""
+
 
         # create file and append header line for csat3b or windmaster
         filename = time.strftime(fname) # start time molded to fname format
@@ -279,6 +296,8 @@ def main(args):
     addr = args.port
     baud = 9600 ## baud rate for instrument
     header = None # header can be hardcoded
+    if instrument_type == 'csat3b':
+        baud = 115200
     if instrument_type == 'uhsas': # header read from instrument
         baud = 115200
         # uhsas file heading is variable and is output by the instrument
@@ -298,7 +317,7 @@ def main(args):
             if local_sec == 0 and (local_min == 0 or local_min == 30):
             #if local_sec == 0:
                 global ser
-                ser = open_port(addr, baud) #oprn port at time limit
+                ser = open_port(addr, baud, instrument_type) #open port at time limit
                 while(True): # when triggered, always run this chunk of code
                     try:
                         #create the logging csv to write to.
