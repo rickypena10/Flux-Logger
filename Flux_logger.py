@@ -176,7 +176,7 @@ def create_logging_file(dir_path, instrument_type, file_heading):
             fname = 'uhsas_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
 
             timing = "Index,Day_CPU(YYYY-MM-DD),time_CPU(HH:MM:SS.FFF),"
-            header = timing+file_heading
+            header = timing+file_heading+"\n"
 
         elif instrument_type == "pops":
             fname = 'pops_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
@@ -194,7 +194,7 @@ def create_logging_file(dir_path, instrument_type, file_heading):
 
         elif instrument_type == "serial":
             fname = 'serial_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
-            header = ""
+            header = "\n"
 
 
         # create file and append header line for csat3b or windmaster
