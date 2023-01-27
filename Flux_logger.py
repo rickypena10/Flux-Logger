@@ -191,7 +191,7 @@ def create_logging_file(dir_path, instrument_type, file_heading):
             stats2 = "Data_status, baseline(counts), stdev_baseline, max_stdev,"
             stats3 = "PumpFB(PID),LaserT(C),LaserFB(PID),Laser_Monitor,Voltage(V),"
             header = ID+stats1+stats2+stats3+bin_header+"\n"
-
+        
         elif instrument_type == "serial":
             fname = 'serial_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
             header = "\n"
@@ -317,7 +317,7 @@ def main(args):
             if local_sec == 0 and (local_min == 0 or local_min == 30):
             #if local_sec == 0:
                 global ser
-                ser = open_port(addr, baud, instrument_type) #open port at time limit
+                ser = open_port(addr, baud, instrument_type) #oprn port at time limit
                 while(True): # when triggered, always run this chunk of code
                     try:
                         #create the logging csv to write to.
