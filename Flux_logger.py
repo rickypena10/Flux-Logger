@@ -180,6 +180,7 @@ def create_logging_file(dir_path, instrument_type, file_heading):
 
         elif instrument_type == "pops":
             fname = 'pops_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
+            timing = "Index,Day_CPU(YYYY-MM-DD),time_CPU(HH:MM:SS.FFF),"
 
             bins = 16
             logmin = 1.759
@@ -190,8 +191,8 @@ def create_logging_file(dir_path, instrument_type, file_heading):
             stats1 = "Particle_con(cc),POPS_flow(sccm),POPS_P(hPa),POPS_T(C),"
             stats2 = "Data_status, baseline(counts), stdev_baseline, max_stdev,"
             stats3 = "PumpFB(PID),LaserT(C),LaserFB(PID),Laser_Monitor,Voltage(V),"
-            header = ID+stats1+stats2+stats3+bin_header+"\n"
-        
+            header = timing+ID+stats1+stats2+stats3+bin_header+"\n"
+
         elif instrument_type == "serial":
             fname = 'serial_%y%m%d%H%M%S.csv'  # set filename with appendix:YYMMDDHHMMSS
             header = "\n"
@@ -260,6 +261,10 @@ def read_data(ser, dataIndex, filename, instrument_type):
         fixed_dataString = ','.join(map(str, split_string))
         fileString = "{:05d}".format(dataIndex) + ", " + str(mDate) + ", " + \
             str(mTime) + "," + fixed_dataString
+
+    elif instrument_type == "pops":
+        fileString = "{:05d}".format(dataIndex) + ", " + str(mDate) + ", " + \
+            str(mTime) + "," + dataString
 
     # Or we can just output the raw data from the instrument
     else: fileString = dataString
